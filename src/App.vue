@@ -8,7 +8,6 @@
         :key="index"
         :message="message.message"
         :isUser="message.isUser"
-        :time="message.time"
       />
     </div>
 
@@ -25,45 +24,89 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 import ChatBlock, { type Props } from "./components/ChatBlock.vue";
+
+const URL = "https://api.openai.com/v1/completions";
+const TOKEN = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX";
+const prompt = ref(`
+Our company is called Daweb Computers, we are located at 20 Regent St., St. James's, London SW1Y 4PH, United Kingdom.
+
+We are open from Monday to Friday, from 9am until 7pm.
+
+We sell computer parts. To get prices and availability for them, customers have to look on our website at www.dawebcomputers.com/products
+
+We also fix computers and recover memory drives. For that service, customers have to book an appointment at www.dawebcomputers.com/book-appointment  before they come in the store, to avoid having to wait a long time in line.
+
+our website is www.dawebcomputers.com
+
+If customers have questions that can't be answered by you, tell them to call us at +44 20 2222 2222
+
+Reply to our customers in our website's chat and give them instructions. Be friendly and try to help them as much as possible.
+
+Provide short answer to fit a chat box.
+`);
 
 const messages = ref<Props[]>([
   {
     message: "Hi there! How can I help you?",
-    time: new Date(new Date().setMinutes(-10)),
     isUser: false,
-  },
-  {
-    message: "I would like to know more about your services.",
-    time: new Date(new Date().setMinutes(-5)),
-    isUser: true,
   },
 ]);
 const message = ref("");
 
-const sendMessage = () => {
+const sendMessage = async () => {
   messages.value.push({
     message: message.value,
-    time: new Date(),
     isUser: true,
   });
-  message.value = "";
   const chatWrapper = document.querySelector(".chat-wrapper");
   setTimeout(() => {
     if (chatWrapper) chatWrapper.scrollTop = chatWrapper.scrollHeight;
   }, 0);
 
-  setTimeout(() => {
-    messages.value.push({
-      message: "Sure, I can help you with that.",
-      time: new Date(),
-      isUser: false,
+  prompt.value += `
+  Human: ${message.value}
+  AI:`;
+
+  message.value = "";
+
+  await fetch(URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${TOKEN}`,
+    },
+    body: JSON.stringify({
+      prompt: prompt.value,
+      model: "text-davinci-003",
+      max_tokens: 150,
+      temperature: 0.9,
+      top_p: 1,
+      frequency_penalty: 0.0,
+      presence_penalty: 0.6,
+      stop: [" Human:", " AI:"],
+    }),
+  })
+    .then(async (res) => {
+      const { choices } = await res.json();
+
+      if (choices && choices.length) {
+        messages.value.push({
+          message: choices[0].text,
+          isUser: false,
+        });
+
+        prompt.value += `\n${choices[0].text}`;
+
+        setTimeout(() => {
+          if (chatWrapper) chatWrapper.scrollTop = chatWrapper.scrollHeight;
+        }, 0);
+      }
+    })
+    .catch((err) => {
+      console.log(err);
     });
-    setTimeout(() => {
-      if (chatWrapper) chatWrapper.scrollTop = chatWrapper.scrollHeight;
-    }, 0);
-  }, 1000);
 };
 </script>
 

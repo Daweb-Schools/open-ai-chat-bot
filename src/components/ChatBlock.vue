@@ -18,7 +18,6 @@
           {{ message }}
         </p>
       </div>
-      <span class="text-xs text-gray-500 leading-none">{{ timeSent }}</span>
     </div>
   </div>
 </template>
@@ -29,23 +28,17 @@ import { formatDistanceToNow } from "date-fns";
 export interface Props {
   message: string;
   isUser?: boolean;
-  time: Date;
 }
 
 const props = defineProps<Props>();
 
 const isUser = ref(props.isUser);
-const time = ref(props.time);
 
 const classes = computed(() => {
   return {
     "bg-blue-600 text-white p-3 rounded-l-lg rounded-br-lg": isUser.value,
     "bg-gray-300 p-3 rounded-r-lg rounded-bl-lg": !isUser.value,
   };
-});
-
-const timeSent = computed(() => {
-  return formatDistanceToNow(time.value, { addSuffix: true });
 });
 </script>
 
