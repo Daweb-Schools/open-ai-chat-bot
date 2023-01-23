@@ -60,6 +60,9 @@ const sendMessage = () => {
       time: new Date(),
       isUser: false,
     });
+    setTimeout(() => {
+      if (chatWrapper) chatWrapper.scrollTop = chatWrapper.scrollHeight;
+    }, 0);
   }, 1000);
 };
 </script>
