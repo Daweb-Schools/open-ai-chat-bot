@@ -1,3 +1,51 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.message {
+  box-sizing: border-box;
+  padding: 0.5rem 1rem;
+  margin: 1rem;
+  border-radius: 1.125rem 1.125rem 1.125rem 0;
+  min-height: 2.25rem;
+  width: fit-content;
+  max-width: 66%;
+}
+
+.typing {
+  display: inline-block;
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-right: 0rem;
+  box-sizing: border-box;
+  background: theme("colors.blue.500");
+  border-radius: 50%;
+}
+
+.typing + .typing {
+  margin-left: 0.25rem;
+}
+
+.typing.typing-1 {
+  animation: typing 3s infinite;
+}
+.typing.typing-2 {
+  animation: typing 3s 250ms infinite;
+}
+.typing.typing-3 {
+  animation: typing 3s 500ms infinite;
+}
+
+@keyframes typing {
+  0%,
+  75%,
+  100% {
+    transform: translate(0, 0.25rem) scale(0.9);
+    opacity: 0.5;
+  }
+
+  25% {
+    transform: translate(0, -0.25rem) scale(1);
+    opacity: 1;
+  }
+}

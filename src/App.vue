@@ -1,25 +1,38 @@
 <template>
-  <div
-    class="flex flex-col flex-grow w-full max-w-xl bg-white shadow-xl rounded-lg overflow-hidden"
-  >
-    <div class="flex flex-col flex-grow h-0 p-4 overflow-auto chat-wrapper">
-      <ChatBlock
-        v-for="(message, index) in messages"
-        :key="index"
-        :message="message.message"
-        :isUser="message.isUser"
-      />
-    </div>
+  <div class="flex flex-col flex-grow w-full max-w-xl">
+    <div
+      class="flex flex-col flex-grow bg-white shadow-xl rounded-lg overflow-hidden"
+    >
+      <div class="flex flex-col flex-grow h-0 p-4 overflow-auto chat-wrapper">
+        <ChatBlock
+          v-for="(message, index) in messages"
+          :key="index"
+          :message="message.message"
+          :isUser="message.isUser"
+        />
 
-    <div class="bg-gray-300 p-4">
-      <input
-        class="flex items-center h-10 w-full rounded px-3 text-sm"
-        type="text"
-        placeholder="Type your message…"
-        v-model="message"
-        @keyup.enter="sendMessage"
-      />
+        <div v-if="loading" class="message">
+          <div class="typing typing-1"></div>
+          <div class="typing typing-2"></div>
+          <div class="typing typing-3"></div>
+        </div>
+      </div>
+
+      <div class="bg-gray-300 p-4">
+        <input
+          class="flex items-center h-10 w-full rounded px-3 text-sm"
+          type="text"
+          placeholder="Type your message…"
+          v-model="message"
+          @keyup.enter="sendMessage"
+        />
+      </div>
     </div>
+    <img
+      src="@/assets/images/daweb-logo.png"
+      class="h-10 mt-5 w-full object-contain"
+      alt="daweb logo"
+    />
   </div>
 </template>
 
@@ -46,6 +59,7 @@ Reply to our customers in our website's chat and give them instructions. Be frie
 
 Provide short answer to fit a chat box.
 `);
+const loading = ref(false);
 
 const messages = ref<Props[]>([
   {
@@ -56,6 +70,7 @@ const messages = ref<Props[]>([
 const message = ref("");
 
 const sendMessage = async () => {
+  loading.value = true;
   messages.value.push({
     message: message.value,
     isUser: true,
@@ -90,6 +105,7 @@ const sendMessage = async () => {
   })
     .then(async (res) => {
       const { choices } = await res.json();
+      loading.value = false;
 
       if (choices && choices.length) {
         messages.value.push({
@@ -105,6 +121,7 @@ const sendMessage = async () => {
       }
     })
     .catch((err) => {
+      loading.value = false;
       console.log(err);
     });
 };

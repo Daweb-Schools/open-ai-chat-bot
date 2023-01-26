@@ -5,13 +5,11 @@
       'ml-auto justify-end': isUser,
     }"
   >
-    <div
-      class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"
+    <img class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-100"
       :class="{
         'order-last ml-3': isUser,
         'mr-3': !isUser,
-      }"
-    ></div>
+      }" :src="getPfp" alt="">
     <div>
       <div :class="classes">
         <p class="text-sm">
@@ -25,6 +23,11 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import { formatDistanceToNow } from "date-fns";
+import dawebPfp from "@/assets/images/daweb-pfp.png";
+import userPfp from "@/assets/images/user-pfp.png";
+
+
+
 export interface Props {
   message: string;
   isUser?: boolean;
@@ -40,6 +43,12 @@ const classes = computed(() => {
     "bg-gray-300 p-3 rounded-r-lg rounded-bl-lg": !isUser.value,
   };
 });
+
+const getPfp = computed(() => {
+  return isUser.value
+    ? userPfp
+    : dawebPfp;
+}); 
 </script>
 
 <style scoped></style>
